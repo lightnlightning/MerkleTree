@@ -10,8 +10,8 @@ class Node:
 class MerkleTree:
     def __init__(self):
         self.root = None
-        self.queue = [] #用来存放正在操作的三个树节点，分别是root,left和right
-        self.create_queue = [] #用来存放先序序列来创建二叉树
+        self.queue = []
+        self.create_queue = []
 
     def hash_calculate(self,value):
         return hashlib.sha256(value).digest()
