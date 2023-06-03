@@ -16,6 +16,13 @@ class MerkleTree:
     def hash_calculate(self,value):
         return hashlib.sha256(value).digest()
 
+    def show_tree(self,root):
+        if not root:
+            return 
+        self.show_tree(root.left)
+        print(root.Value.hex())
+        self.show_tree(root.right)
+        
     def build_tree(self,list_data):
         for i in list_data :
             new_node = Node(self.hash_calculate(i.encode('utf-8')))
@@ -50,4 +57,7 @@ if __name__ == '__main__':
     #  "0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB"
     #  ]
     list_data = ['a','b','c','d','e'] 
-    print(m.build_tree( list_data ).Value.hex())
+    tree_root = m.build_tree( list_data )
+    print(tree_root.Value.hex())
+    m.show_tree(tree_root)
+
