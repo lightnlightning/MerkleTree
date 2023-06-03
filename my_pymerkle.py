@@ -4,6 +4,7 @@ import hashlib
 class Node:
     def __init__(self,value=None):
         self.Value = value
+        self.parent = None
         self.left = None
         self.right = None
 
@@ -43,6 +44,9 @@ class MerkleTree:
                 node_parent = Node(value_parent)
                 node_parent.left = node_left
                 node_parent.right = node_right
+                node_left.parent = node_parent
+                if node_right:
+                    node_right.parent = node_parent
                 self.create_queue.append(node_parent)
             self.queue = self.create_queue
         return self.root
