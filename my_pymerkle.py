@@ -7,7 +7,9 @@ class Node:
         self.parent = None
         self.left = None
         self.right = None
-
+    def __repr__(self):
+        return repr((self.Value, self.parent, self.left,self.right))
+    
 class MerkleTree:
     def __init__(self):
         self.root = None
@@ -23,11 +25,13 @@ class MerkleTree:
         self.show_tree(root.left)
         print(root.Value.hex())
         self.show_tree(root.right)
-        
-    def build_tree(self,list_data):
+
+    def build_tree(self,list_data,sort_leaves=False, sort_pairs=False):
         for i in list_data :
             new_node = Node(self.hash_calculate(i.encode('utf-8')))
             self.queue.append(new_node)
+        if sort_leaves:
+            self.queue = sorted(self.queue, key=lambda mt: mt.Value)
         while self.root == None :
             if len(self.queue) == 1:
                 self.root = self.queue.pop(0)
@@ -61,7 +65,21 @@ if __name__ == '__main__':
     #  "0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB"
     #  ]
     list_data = ['a','b','c','d','e'] 
-    tree_root = m.build_tree( list_data )
+    tree_root = m.build_tree( list_data,sort_leaves=True)
     print(tree_root.Value.hex())
-    m.show_tree(tree_root)
+    #  m.show_tree(tree_root)
+
+#  def main():
+#      print("hello,MerkleTreeNode")
+#      m = MerkleTree()
+#      #  list_data = [
+#      #  "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", 
+#      #  "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2",
+#      #  "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db",
+#      #  "0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB"
+#      #  ]
+#      list_data = ['a','b','c','d','e'] 
+#      tree_root = m.build_tree( list_data,sort_leaves=True)
+#      print(tree_root.Value.hex())
+#      #  m.show_tree(tree_root)
 
