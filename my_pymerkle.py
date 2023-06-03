@@ -41,6 +41,11 @@ class MerkleTree:
                 node_left = self.queue.pop(0)
                 if self.queue:
                     node_right = self.queue.pop(0)
+                    if sort_pairs:
+                        if node_left.Value > node_right.Value:
+                            temp = node_left
+                            node_left = node_right
+                            node_right = temp
                     value_parent = self.hash_calculate(node_left.Value + node_right.Value)
                 else:
                     node_right = None
@@ -65,7 +70,7 @@ if __name__ == '__main__':
     #  "0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB"
     #  ]
     list_data = ['a','b','c','d','e'] 
-    tree_root = m.build_tree( list_data,sort_leaves=True)
+    tree_root = m.build_tree( list_data,sort_leaves=False,sort_pairs=True)
     print(tree_root.Value.hex())
     #  m.show_tree(tree_root)
 
