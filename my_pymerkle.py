@@ -58,6 +58,22 @@ class MerkleTree:
             cursor_node = cursor_node.parent
         return proof_list
         
+    def verify_proof(self, root, proof, leaf, sort_pairs=True):
+        cursor_hash = self.hash_calculate(leaf.encode('utf-8'))
+        for i in proof:
+            ih = bytes.fromhex(i)
+            if sort_pairs:
+                if cursor_hash < ih:
+                    cursor_hash = self.hash_calculate(cursor_hash + ih) 
+                else:
+                    cursor_hash = self.hash_calculate(ih + cursor_hash) 
+            else:
+                cursor_hash = self.hash_calculate(cursor_hash + ih) 
+        if cursor_hash == root.Value:
+            return True
+        else:
+            return False
+
     def build_tree(self,list_data,sort_leaves=False, sort_pairs=False):
         for i in list_data :
             new_node = Node(self.hash_calculate(i.encode('utf-8')))
@@ -103,16 +119,20 @@ if __name__ == '__main__':
     #  ]
     list_data = ['a','b','c','d','e'] 
     tree_root = m.build_tree( list_data,sort_leaves=False,sort_pairs=True)
-    #  print(tree_root.Value.hex())
+    print('---------root-----------')
+    print(tree_root.Value.hex())
     #  m.show_tree(tree_root)
     print('---------leaves-----------')
     list_leaves = m.get_leaves(tree_root)
     for i in list_leaves:
         print(i.Value.hex())
     print('---------proof-----------')
-    proof_list = m.get_proof(tree_root,'e')
-    for i in proof_list:
-        print(i)
+    print('a')
+    proof_list = m.get_proof(tree_root,'a')
+    print(proof_list)
+    print('---------verify-----------')
+    print('a')
+    print(m.verify_proof(tree_root,proof_list,'a'))
 
 
 #  def main():
