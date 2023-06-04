@@ -38,6 +38,26 @@ class MerkleTree:
         inner(root)
         return leaves_list
 
+    def get_proof(self,root=None,string_find=None):
+        proof_list = []
+        cursor_node = None
+        string_hash = self.hash_calculate(string_find.encode('utf-8'))
+        leaves_list = self.get_leaves(root)
+        for i in leaves_list:
+            if i.Value == string_hash:
+                cursor_node = i
+                break
+        if not cursor_node:
+            return False
+        while cursor_node.parent:
+            if cursor_node.parent.left and cursor_node.parent.right:
+                if cursor_node.parent.left.Value == cursor_node.Value:
+                    proof_list.append(cursor_node.parent.right.Value.hex())
+                else:
+                    proof_list.append(cursor_node.parent.left.Value.hex())
+            cursor_node = cursor_node.parent
+        return proof_list
+        
     def build_tree(self,list_data,sort_leaves=False, sort_pairs=False):
         for i in list_data :
             new_node = Node(self.hash_calculate(i.encode('utf-8')))
@@ -74,7 +94,6 @@ class MerkleTree:
 
 if __name__ == '__main__':
     print("hello,MerkleTreeNode")
-    print('------------------------')
     m = MerkleTree()
     #  list_data = [
     #  "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", 
@@ -86,10 +105,14 @@ if __name__ == '__main__':
     tree_root = m.build_tree( list_data,sort_leaves=False,sort_pairs=True)
     #  print(tree_root.Value.hex())
     #  m.show_tree(tree_root)
+    print('---------leaves-----------')
     list_leaves = m.get_leaves(tree_root)
     for i in list_leaves:
         print(i.Value.hex())
-    print('------------------------')
+    print('---------proof-----------')
+    proof_list = m.get_proof(tree_root,'e')
+    for i in proof_list:
+        print(i)
 
 
 #  def main():
