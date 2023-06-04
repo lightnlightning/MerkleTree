@@ -7,8 +7,8 @@ class Node:
         self.parent = None
         self.left = None
         self.right = None
-    def __repr__(self):
-        return repr((self.Value, self.parent, self.left,self.right))
+    #  def __repr__(self):
+    #      return repr((self.Value, self.parent, self.left,self.right))
     
 class MerkleTree:
     def __init__(self):
@@ -25,6 +25,18 @@ class MerkleTree:
         self.show_tree(root.left)
         print(root.Value.hex())
         self.show_tree(root.right)
+
+    def get_leaves(self,root):
+        leaves_list = []
+        def inner(root):
+            if not root:
+                return 
+            inner(root.left)
+            inner(root.right)
+            if root.left == None and root.right == None:
+                leaves_list.append(root)
+        inner(root)
+        return leaves_list
 
     def build_tree(self,list_data,sort_leaves=False, sort_pairs=False):
         for i in list_data :
@@ -62,6 +74,7 @@ class MerkleTree:
 
 if __name__ == '__main__':
     print("hello,MerkleTreeNode")
+    print('------------------------')
     m = MerkleTree()
     #  list_data = [
     #  "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", 
@@ -71,8 +84,13 @@ if __name__ == '__main__':
     #  ]
     list_data = ['a','b','c','d','e'] 
     tree_root = m.build_tree( list_data,sort_leaves=False,sort_pairs=True)
-    print(tree_root.Value.hex())
+    #  print(tree_root.Value.hex())
     #  m.show_tree(tree_root)
+    list_leaves = m.get_leaves(tree_root)
+    for i in list_leaves:
+        print(i.Value.hex())
+    print('------------------------')
+
 
 #  def main():
 #      print("hello,MerkleTreeNode")
