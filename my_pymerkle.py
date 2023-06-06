@@ -17,17 +17,24 @@ class MerkleTree:
         self.queue = []
         self.create_queue = []
 
-    def hash_calculate(self,hexstr=None,string=None):
-        if bool(hexstr) ^ bool(string):
-            if hexstr:
-                return hashlib.sha256(bytes.fromhex(hexstr)).hexdigest()
-            else:
-                return hashlib.sha256(string.encode('utf-8')).hexdigest()
+    def hash_calculate(self,hexstring=None,string=None,hashs='keccak'):
+        if bool(hexstring) ^ bool(string):
+            match hashs:
+                case 'sha256':
+                    if hexstring:
+                        return hashlib.sha256(bytes.fromhex(hexstring)).hexdigest()
+                    else:
+                        return hashlib.sha256(string.encode('utf-8')).hexdigest()
+                case 'keccak':
+                    if hexstring:
+                        return Web3.keccak(hexstr=hexstring).hex()[2:]
+                    else:
+                        return Web3.keccak(text=string).hex()[2:]
+                case _:
+                    return False
         else:
             return False
                 
-        # return Web3.keccak(text=bytes.decode(value).digest()
-
     def show_tree(self,root):
         if not root:
             return 
@@ -67,22 +74,19 @@ class MerkleTree:
             cursor_node = cursor_node.parent
         return proof_list
         
-    def verify_proof(self, root, proof, leaf, sort_pairs=True):
+    def verify_proof(self, root, proof, leaf):
         cursor_hash = self.hash_calculate(string=leaf)
         for i_hash in proof:
-            if sort_pairs:
-                if cursor_hash < i_hash:
-                    cursor_hash = self.hash_calculate(hexstr=(cursor_hash + i_hash)) 
-                else:
-                    cursor_hash = self.hash_calculate(hexstr=(i_hash + cursor_hash))
+            if cursor_hash < i_hash:
+                cursor_hash = self.hash_calculate(hexstring=(cursor_hash + i_hash)) 
             else:
-                cursor_hash = self.hash_calculate(hexstr=(cursor_hash + i_hash))
+                cursor_hash = self.hash_calculate(hexstring=(i_hash + cursor_hash))
         if cursor_hash == root.Value:
             return True
         else:
             return False
 
-    def build_tree(self,list_data,sort_leaves=False, sort_pairs=False):
+    def build_tree(self,list_data,sort_leaves=False):
         for i_str in list_data :
             new_node = Node(self.hash_calculate(string=i_str))
             self.queue.append(new_node)
@@ -97,12 +101,10 @@ class MerkleTree:
                 node_left = self.queue.pop(0)
                 if self.queue:
                     node_right = self.queue.pop(0)
-                    if sort_pairs:
-                        if node_left.Value > node_right.Value:
-                            temp = node_left
-                            node_left = node_right
-                            node_right = temp
-                    value_parent = self.hash_calculate(hexstr=(node_left.Value + node_right.Value))
+                    if node_left.Value > node_right.Value:
+                        value_parent = self.hash_calculate(hexstring=(node_right.Value + node_left.Value))
+                    else:
+                        value_parent = self.hash_calculate(hexstring=(node_left.Value + node_right.Value))
                 else:
                     node_right = None
                     value_parent = node_left.Value
@@ -126,7 +128,7 @@ if __name__ == '__main__':
     #  "0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB"
     #  ]
     list_data = ['a','b','c','d','e'] 
-    tree_root = m.build_tree( list_data,sort_leaves=False,sort_pairs=True)
+    tree_root = m.build_tree( list_data,sort_leaves=True)
     print('---------root-----------')
     print(tree_root.Value)
     #  m.show_tree(tree_root)
@@ -141,6 +143,7 @@ if __name__ == '__main__':
     print('---------verify-----------')
     print('a')
     print(m.verify_proof(tree_root,proof_list,'a'))
+    assert m.verify_proof(tree_root,proof_list,'a') == True
 
 #  def main():
 #      print("hello,MerkleTreeNode")
