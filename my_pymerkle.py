@@ -12,14 +12,15 @@ class Node:
          # return repr((self.Value, self.parent, self.left,self.right))
     
 class MerkleTree:
-    def __init__(self):
+    def __init__(self,method='keccak'):
         self.root = None
         self.queue = []
         self.create_queue = []
+        self.hash_method = method
 
-    def hash_calculate(self,hexstring=None,string=None,hashs='keccak'):
+    def hash_calculate(self,hexstring=None,string=None):
         if bool(hexstring) ^ bool(string):
-            match hashs:
+            match self.hash_method:
                 case 'sha256':
                     if hexstring:
                         return hashlib.sha256(bytes.fromhex(hexstring)).hexdigest()
@@ -120,7 +121,7 @@ class MerkleTree:
 
 if __name__ == '__main__':
     print("hello,MerkleTreeNode")
-    m = MerkleTree()
+    m = MerkleTree('sha256')
     #  list_data = [
     #  "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4", 
     #  "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2",
